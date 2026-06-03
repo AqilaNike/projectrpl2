@@ -41,7 +41,5 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,doctor']
     Route::post('/poli/{poli}/kuota',                 [AdminController::class, 'updateKuotaPoli'])->name('poli.kuota');
     Route::post('/poli/{poli}/toggle',                [AdminController::class, 'togglePoli'])->name('poli.toggle');
 });
-Route::get('/test', function () {
-    return 'Hello';
-});
+
 
