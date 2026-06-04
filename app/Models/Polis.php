@@ -12,7 +12,7 @@ class Polis extends Model
 
     public function kuotaTersisaHariIni(): int
     {
-        $terisi = $this->antreans()
+        $terisi = Antrean::where('poli_id', $this->id)
             ->whereDate('tanggal', today())
             ->whereIn('status', ['menunggu','dipanggil'])
             ->count();

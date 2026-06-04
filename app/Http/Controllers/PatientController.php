@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Poli;
 use App\Models\Doctor;
 use App\Models\JadwalDokter;
 use App\Models\Antrean;
@@ -26,10 +25,18 @@ class PatientController extends Controller
         $notifications = Notifikasi::where('user_id', $user->id)
             ->latest()->take(5)->get();
 
-        $polis = Polis::where('is_active', true)->get()->map(function ($p) {
-            $p->kuota_tersisa = $p->kuotaTersisaHariIni();
-            return $p;
-        });
+        // Get polis with calculated kuota_tersisa
+        $polis = Polis::where('is_active', true)
+            ->get()
+            ->map(function ($p) {
+                // Count antreans for this poli today
+                $terisi = Antrean::where('poli_id', $p->id)
+                    ->whereDate('tanggal', today())
+                    ->whereIn('status', ['menunggu','dipanggil'])
+                    ->count();
+                $p->kuota_tersisa = max(0, $p->kuota_harian - $terisi);
+                return $p;
+            });
 
         return view('patient.home', compact('user', 'activeQueue', 'notifications', 'polis'));
     }

@@ -45,7 +45,7 @@ class AuthController extends Controller
 
     public function showRegister()
     {
-        return view('auth.login'); // same page, tab=register
+        return view('auth.login', ['showRegister' => true]);
     }
 
     public function register(Request $request)

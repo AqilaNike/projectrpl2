@@ -12,7 +12,7 @@ class Antrean extends Model
     protected $casts = ['tanggal' => 'date', 'dipanggil_at' => 'datetime', 'selesai_at' => 'datetime'];
 
     public function user()   { return $this->belongsTo(User::class); }
-    public function poli()   { return $this->belongsTo(Poli::class); }
+    public function poli()   { return $this->belongsTo(Polis::class); }
     public function doctor() { return $this->belongsTo(Doctor::class); }
     public function jadwal() { return $this->belongsTo(JadwalDokter::class, 'jadwal_id'); }
 

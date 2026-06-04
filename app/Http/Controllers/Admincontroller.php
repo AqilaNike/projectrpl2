@@ -6,7 +6,7 @@ use App\Models\Antrean;
 use App\Models\Doctor;
 use App\Models\JadwalDokter;
 use App\Models\Notifikasi;
-use App\Models\Poli;
+use App\Models\Polis;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -32,7 +32,7 @@ class AdminController extends Controller
         });
 
         $doctors   = Doctor::with(['user','poli'])->where('is_active', true)->get();
-        $polis     = Poli::all();
+        $polis     = Polis::all();
         $recentAnt = Antrean::with(['user','poli','doctor.user'])
             ->whereDate('tanggal', today())
             ->latest()->take(5)->get();
@@ -50,7 +50,7 @@ class AdminController extends Controller
         if ($request->filled('search'))   $query->whereHas('user', fn($q) => $q->where('name','like',"%{$request->search}%")->orWhere('nik','like',"%{$request->search}%"));
 
         $antreans = $query->latest()->paginate(15)->withQueryString();
-        $polis    = Poli::all();
+        $polis    = Polis::all();
 
         $stats = [
             'total'    => Antrean::whereDate('tanggal', today())->count(),
@@ -109,7 +109,7 @@ class AdminController extends Controller
     // ───── Kelola Jadwal ─────
     public function jadwal()
     {
-        $polis   = Poli::all();
+        $polis   = Polis::all();
         $doctors = Doctor::with(['user','poli'])->get();
         $jadwals = JadwalDokter::with(['doctor.user','poli'])
             ->whereBetween('tanggal', [today(), today()->addDays(6)])
@@ -131,14 +131,14 @@ class AdminController extends Controller
         return back()->with('success', 'Jadwal berhasil ditambahkan.');
     }
 
-    public function updateKuotaPoli(Request $request, Poli $poli)
+    public function updateKuotaPoli(Request $request, Polis $poli)
     {
         $request->validate(['kuota_harian' => 'required|integer|min:1']);
         $poli->update(['kuota_harian' => $request->kuota_harian]);
         return response()->json(['success' => true, 'kuota' => $poli->kuota_harian]);
     }
 
-    public function togglePoli(Poli $poli)
+    public function togglePoli(Polis $poli)
     {
         $poli->update(['is_active' => !$poli->is_active]);
         return response()->json(['success' => true, 'is_active' => $poli->is_active]);

@@ -6,9 +6,13 @@ use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Auth ───────────────────────────────────────────────────────────────────
-Route::get('/',        [AuthController::class, 'showLogin'])->name('login');
+// Redirect root to the named login route to avoid duplicate route names
+Route::get('/', function () {
+    return redirect()->route('login');
+});
 Route::get('/login',   [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login',  [AuthController::class, 'login'])->name('login.post');
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register.show');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
