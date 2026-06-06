@@ -14,6 +14,10 @@
             <a href="{{ route('admin.dashboard') }}" class="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white">Dashboard</a>
         </div>
 
+        <div id="admin-toast" class="hidden mt-6 rounded-2xl p-4 text-sm shadow-sm transition-all duration-300">
+            <div id="admin-toast-content" class="flex items-start gap-3"></div>
+        </div>
+
         <div class="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
             <div class="rounded-3xl bg-white p-6 border border-outline-variant">
                 <h2 class="text-lg font-semibold text-on-surface">Tambah Jadwal Baru</h2>
@@ -107,10 +111,13 @@
 
             <div class="mt-6 space-y-4">
                 @foreach($polis as $poli)
-                    <div class="rounded-3xl bg-surface-container p-4 grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
+                    <div data-poli-id="{{ $poli->id }}" data-poli-kode="{{ $poli->kode }}" class="rounded-3xl bg-surface-container p-4 grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
                         <div>
                             <p class="font-semibold text-on-surface">{{ $poli->nama }}</p>
-                            <p class="text-sm text-on-surface-variant">Kode {{ $poli->kode }} • Kuota harian {{ $poli->kuota_harian }}</p>
+                            <p class="text-sm text-on-surface-variant">
+                                <span class="poli-kuota-text">Kode {{ $poli->kode }} • Kuota harian {{ $poli->kuota_harian }}</span>
+                                • <span class="poli-status-text">{{ $poli->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                            </p>
                         </div>
                         <div class="flex flex-col gap-3 md:flex-row md:items-center">
                             <form action="{{ route('admin.poli.kuota', $poli->id) }}" method="POST" class="flex gap-2">
@@ -131,4 +138,102 @@
         </div>
     </div>
 </main>
+<script>
+    function showAdminToast(message, type = 'success') {
+        const toast = document.getElementById('admin-toast');
+        const toastContent = document.getElementById('admin-toast-content');
+        if (!toast || !toastContent) return;
+
+        const colorMap = {
+            success: {
+                bg: 'bg-[#d1e7dd]',
+                border: 'border-[#badbcc]',
+                text: 'text-[#0f5132]',
+                icon: 'check_circle'
+            },
+            error: {
+                bg: 'bg-[#f8d7da]',
+                border: 'border-[#f5c2c7]',
+                text: 'text-[#842029]',
+                icon: 'error'
+            }
+        };
+
+        const style = colorMap[type] || colorMap.success;
+
+        toast.className = `mt-6 rounded-2xl border p-4 text-sm shadow-sm transition-all duration-300 ${style.bg} ${style.border} ${style.text}`;
+        toastContent.innerHTML = `
+            <span class="material-symbols-outlined text-lg">${style.icon}</span>
+            <div>${message}</div>
+        `;
+        toast.classList.remove('hidden');
+
+        window.clearTimeout(window.adminToastTimer);
+        window.adminToastTimer = window.setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 3500);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const forms = document.querySelectorAll('form[action*="poli/"]');
+
+        forms.forEach(form => {
+            form.addEventListener('submit', async event => {
+                event.preventDefault();
+                const action = form.getAttribute('action');
+                const method = form.getAttribute('method') || 'POST';
+                const formData = new FormData(form);
+
+                try {
+                    const response = await fetch(action, {
+                        method: method.toUpperCase(),
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        },
+                        body: formData,
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => null);
+                        throw new Error(errorData?.message || 'Terjadi kesalahan saat memproses permintaan.');
+                    }
+
+                    const data = await response.json();
+
+                    if (action.includes('/kuota')) {
+                        const parent = form.closest('[data-poli-id]');
+                        if (parent) {
+                            const kuotaText = parent.querySelector('.poli-kuota-text');
+                            if (kuotaText) {
+                                kuotaText.textContent = `Kode ${parent.dataset.poliKode} • Kuota harian ${data.kuota}`;
+                            }
+                        }
+                        showAdminToast('Kuota harian disimpan', 'success');
+                    }
+
+                    if (action.includes('/toggle')) {
+                        const button = form.querySelector('button[type="submit"]');
+                        const parent = form.closest('[data-poli-id]');
+                        if (button && parent) {
+                            const isActive = data.is_active;
+                            button.textContent = isActive ? 'Nonaktifkan' : 'Aktifkan';
+                            button.classList.toggle('bg-error-container', isActive);
+                            button.classList.toggle('text-on-error-container', isActive);
+                            button.classList.toggle('bg-secondary', !isActive);
+                            button.classList.toggle('text-white', !isActive);
+
+                            const statusText = parent.querySelector('.poli-status-text');
+                            if (statusText) {
+                                statusText.textContent = isActive ? 'Aktif' : 'Nonaktif';
+                            }
+                        }
+                        showAdminToast(`Poli berhasil ${data.is_active ? 'diaktifkan' : 'dinonaktifkan'}`, 'success');
+                    }
+                } catch (error) {
+                    showAdminToast(error.message || 'Gagal menyimpan perubahan.', 'error');
+            });
+        });
+    });
+</script>
 @endsection
