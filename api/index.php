@@ -17,6 +17,7 @@ $storagePaths = [
     '/tmp/storage/framework/cache/data',
     '/tmp/storage/framework/sessions',
     '/tmp/storage/framework/views',
+    '/tmp/storage/bootstrap/cache',
     '/tmp/storage/logs',
 ];
 
