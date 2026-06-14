@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\Pengguna;
+use App\Models\Pasien;
 use App\Models\Notifikasi;
+use App\Models\Antrean;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -24,20 +27,30 @@ class AuthController extends Controller
 
         $identifier = $request->identifier;
 
-        // Try login with email, NIK, BPJS, or phone
-        $user = User::where('email', $identifier)
-            ->orWhere('nik', $identifier)
-            ->orWhere('no_bpjs', $identifier)
-            ->orWhere('no_hp', $identifier)
-            ->first();
+        // Try login with email first
+        $pengguna = Pengguna::where('email', $identifier)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        // If not found by email, try by NIK or phone via pasien table
+        if (!$pengguna) {
+            $pasien = Pasien::where('nik', $identifier)
+                ->orWhere('nomorhp', $identifier)
+                ->first();
+            if ($pasien) {
+                $pengguna = $pasien->pengguna;
+            }
+        }
+
+        if (!$pengguna || !Hash::check($request->password, $pengguna->passwordhash)) {
             return back()->withErrors(['identifier' => 'Identitas atau kata sandi salah.'])->withInput();
         }
 
-        Auth::login($user, $request->boolean('remember'));
+        if ($pengguna->statusakun !== 'aktif') {
+            return back()->withErrors(['identifier' => 'Akun Anda tidak aktif.'])->withInput();
+        }
 
-        if ($user->isAdmin() || $user->isDoctor()) {
+        Auth::login($pengguna, $request->boolean('remember'));
+
+        if ($pengguna->isAdmin() || $pengguna->isDokter() || $pengguna->isPetugas() || $pengguna->isKepala()) {
             return redirect()->route('admin.dashboard');
         }
         return redirect()->route('patient.home');
@@ -51,31 +64,33 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name'   => 'required|string|max:255',
-            'nik'    => 'required|digits:16|unique:users,nik',
-            'no_bpjs'=> 'nullable|string|unique:users,no_bpjs',
-            'no_hp'  => 'required|string|min:9|max:15',
-            'password'=> 'required|string|min:6|confirmed',
+            'name'     => 'required|string|max:255',
+            'nik'      => 'required|digits:16|unique:pasien,nik',
+            'no_hp'    => 'required|string|min:9|max:15',
+            'email'    => 'nullable|email|unique:pengguna,email',
+            'password' => 'required|string|min:6|confirmed',
         ]);
 
-        $user = User::create([
-            'name'    => $request->name,
-            'nik'     => $request->nik,
-            'no_bpjs' => $request->no_bpjs,
-            'no_hp'   => $request->no_hp,
-            'email'   => $request->email,
-            'password'=> Hash::make($request->password),
-            'role'    => 'patient',
+        $idpengguna = 'USR' . Str::upper(Str::random(9));
+        $idpasien   = 'PSN' . Str::upper(Str::random(9));
+
+        $pengguna = Pengguna::create([
+            'idpengguna'   => $idpengguna,
+            'email'        => $request->email ?? $request->nik . '@puskesmas.local',
+            'passwordhash' => Hash::make($request->password),
+            'role'         => 'pasien',
+            'statusakun'   => 'aktif',
         ]);
 
-        Notifikasi::create([
-            'user_id' => $user->id,
-            'judul'   => 'Selamat Datang di Puskesmas Digital!',
-            'pesan'   => 'Akun Anda berhasil dibuat. Silakan ambil antrean untuk layanan kesehatan Anda.',
-            'icon'    => 'check_circle',
+        Pasien::create([
+            'idpasien'    => $idpasien,
+            'idpengguna'  => $idpengguna,
+            'nik'         => $request->nik,
+            'namapasien'  => $request->name,
+            'nomorhp'     => $request->no_hp,
         ]);
 
-        Auth::login($user);
+        Auth::login($pengguna);
         return redirect()->route('patient.home');
     }
 

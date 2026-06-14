@@ -4,7 +4,11 @@
 
 @section('content')
 @include('layouts.admin-sidebar')
+<<<<<<< HEAD
 <main class="flex-1 md:ml-64 pt-8 pb-20 px-4 md:px-8 min-h-screen">
+=======
+<main class="pt-24 pb-20 px-4 md:px-16 max-w-7xl mx-auto md:ml-64">
+>>>>>>> 1898eeecec7caa27b4a2bf4b955cdb0bb07b3db6
     <div class="rounded-3xl bg-surface-container p-6 shadow-sm border border-outline-variant">
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
@@ -20,10 +24,10 @@
                 @if($dipanggil)
                     <div class="mt-6 space-y-3">
                         <p class="text-sm text-on-surface-variant">Nomor antrean</p>
-                        <p class="text-4xl font-bold text-primary">{{ $dipanggil->nomor_antrean }}</p>
-                        <p class="text-sm text-on-surface">Pasien: {{ $dipanggil->user->name }}</p>
-                        <p class="text-sm text-on-surface">Poli: {{ $dipanggil->poli->nama }}</p>
-                        <p class="text-sm text-on-surface">Dokter: {{ $dipanggil->doctor->user->name }}</p>
+                        <p class="text-4xl font-bold text-primary">{{ $dipanggil->nomorantrean }}</p>
+                        <p class="text-sm text-on-surface">Pasien: {{ $dipanggil->pasien->namapasien }}</p>
+                        <p class="text-sm text-on-surface">Poli: {{ $dipanggil->jadwal->poli->namapoli }}</p>
+                        <p class="text-sm text-on-surface">Dokter: {{ $dipanggil->jadwal->dokter->namadokter }}</p>
                     </div>
                 @else
                     <p class="mt-4 text-sm text-on-surface-variant">Belum ada antrean yang sedang dipanggil.</p>
@@ -36,8 +40,8 @@
                     <div class="mt-6 space-y-4">
                         @foreach($berikutnya as $item)
                             <div class="rounded-2xl bg-surface-container p-4">
-                                <p class="font-semibold text-on-surface">{{ $item->nomor_antrean }} — {{ $item->user->name }}</p>
-                                <p class="text-sm text-on-surface-variant">{{ $item->poli->nama }} • {{ $item->tanggal->format('d M Y') }}</p>
+                                <p class="font-semibold text-on-surface">{{ $item->nomorantrean }} — {{ $item->pasien->namapasien }}</p>
+                                <p class="text-sm text-on-surface-variant">{{ $item->jadwal->poli->namapoli }} • {{ $item->jadwal->tanggal->format('d M Y') }}</p>
                             </div>
                         @endforeach
                     </div>
@@ -73,6 +77,7 @@
             <section class="flex-[3] flex flex-col gap-6">
                 <div class="bg-white rounded-[32px] shadow-lg border border-outline-variant flex-1 flex flex-col items-center justify-between p-8 relative overflow-hidden">
                     @if($dipanggil)
+<<<<<<< HEAD
                     
                     {{-- Header / Badge --}}
                     <div class="w-full flex justify-start z-10">
@@ -80,6 +85,19 @@
                              style="animation:pulse-custom 2s infinite ease-in-out">
                             <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">volume_up</span>
                             <span class="text-sm font-black uppercase tracking-widest">Sekarang Dipanggil</span>
+=======
+                    <div class="absolute top-8 left-8 bg-primary text-white px-8 py-3 rounded-full flex items-center gap-3"
+                         style="animation:pulse-custom 2s infinite ease-in-out">
+                        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">volume_up</span>
+                        <span class="text-sm font-black uppercase tracking-widest">Sekarang Dipanggil</span>
+                    </div>
+                    <div class="text-center">
+                        <h2 class="text-on-surface-variant text-sm font-bold uppercase tracking-[0.2em] mb-4">Nomor Antrean</h2>
+                        <div class="text-[180px] leading-none font-black text-primary tracking-tighter drop-shadow-sm">{{ $dipanggil->nomorantrean }}</div>
+                        <div class="mt-8 flex items-center justify-center gap-4 text-primary bg-primary-container/20 px-10 py-5 rounded-2xl border border-primary/10">
+                            <span class="material-symbols-outlined text-5xl">medical_services</span>
+                            <span class="text-5xl font-bold leading-none">{{ $dipanggil->jadwal->poli->namapoli }}</span>
+>>>>>>> 1898eeecec7caa27b4a2bf4b955cdb0bb07b3db6
                         </div>
                     </div>
 
@@ -121,6 +139,7 @@
 
                 @forelse($berikutnya as $ant)
                 @php $colors=['border-l-primary','border-l-secondary','border-l-tertiary']; $c=$colors[$loop->index % 3]; @endphp
+<<<<<<< HEAD
                 <div class="bg-white p-4 xl:p-6 rounded-2xl shadow-sm border-l-8 {{ $c }} border border-outline-variant flex items-center justify-between hover:scale-[1.02] transition-all">
                     <div class="min-w-0 pr-4">
                         <p class="text-xs font-bold text-on-surface-variant uppercase truncate">{{ $ant->poli->nama }}</p>
@@ -128,6 +147,15 @@
                     </div>
                     <div class="bg-surface-container p-3 rounded-xl shrink-0">
                         <span class="material-symbols-outlined text-primary text-2xl xl:text-3xl">{{ $ant->poli->icon }}</span>
+=======
+                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-8 {{ $c }} border border-outline-variant flex items-center justify-between hover:scale-[1.02] transition-all">
+                    <div>
+                        <p class="text-xs font-bold text-on-surface-variant uppercase">{{ $ant->jadwal->poli->namapoli }}</p>
+                        <p class="text-5xl font-black text-on-surface leading-tight">{{ $ant->nomorantrean }}</p>
+                    </div>
+                    <div class="bg-surface-container p-3 rounded-xl">
+                        <span class="material-symbols-outlined text-primary text-3xl">medical_services</span>
+>>>>>>> 1898eeecec7caa27b4a2bf4b955cdb0bb07b3db6
                     </div>
                 </div>
                 @empty

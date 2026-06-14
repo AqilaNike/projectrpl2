@@ -1,12 +1,13 @@
 <?php
 namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
-
 class Notifikasi extends Model
 {
-    // Migration created table 'notifikases' (note the spelling).
-    // Ensure model points to the correct table to avoid "table not found" errors.
-    protected $table = 'notifikases';
-    protected $fillable = ['user_id','judul','pesan','icon','is_read'];
-    public function user() { return $this->belongsTo(User::class); }
+    protected $table = 'notifikasi';
+    protected $primaryKey = 'idnotifikasi';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $fillable = ['idnotifikasi', 'idantrean', 'jenisnotifikasi', 'pesan', 'statuskirim', 'waktukirim', 'nomortujuan'];
+    protected $casts = ['waktukirim' => 'datetime'];
+    public function antrean() { return $this->belongsTo(Antrean::class, 'idantrean', 'idantrean'); }
 }

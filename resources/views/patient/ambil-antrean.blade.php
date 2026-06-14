@@ -17,7 +17,7 @@
                     <select name="poli_id" id="poli-select" class="w-full rounded-2xl border border-outline-variant px-4 py-3">
                         <option value="">Pilih Poli</option>
                         @foreach($polis as $poli)
-                            <option value="{{ $poli->id }}">{{ $poli->nama }} ({{ $poli->kode }})</option>
+                            <option value="{{ $poli->idpoli }}">{{ $poli->namapoli }} ({{ $poli->idpoli }})</option>
                         @endforeach
                     </select>
                     @error('poli_id')<p class="text-sm text-error mt-1">{{ $message }}</p>@enderror

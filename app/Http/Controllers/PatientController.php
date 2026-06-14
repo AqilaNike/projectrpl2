@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Doctor;
-use App\Models\JadwalDokter;
+use App\Models\Dokter;
+use App\Models\JadwalLayanan;
 use App\Models\Antrean;
 use App\Models\Notifikasi;
-use App\Models\Polis;
+use App\Models\Poli;
+use App\Models\Pasien;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class PatientController extends Controller
 {
     public function home()
     {
+<<<<<<< HEAD
         $user = Auth::user();
         $activeQueue = Antrean::where('user_id', $user->id)
             ->whereIn('status', ['menunggu', 'dipanggil'])
@@ -23,64 +25,76 @@ class PatientController extends Controller
             ->orderBy('jam_kedatangan', 'asc')
             ->with(['poli','doctor.user'])
             ->first();
+=======
+        $pengguna = Auth::user();
+        $pasien   = $pengguna->pasien;
+>>>>>>> 1898eeecec7caa27b4a2bf4b955cdb0bb07b3db6
 
-        $notifications = Notifikasi::where('user_id', $user->id)
-            ->latest()->take(5)->get();
+        $activeQueue = null;
+        if ($pasien) {
+            $activeQueue = Antrean::where('idpasien', $pasien->idpasien)
+                ->whereIn('status', ['menunggu', 'dipanggil'])
+                ->whereHas('jadwal', fn($q) => $q->where('tanggal', today()))
+                ->with(['jadwal.poli', 'jadwal.dokter'])
+                ->first();
+        }
 
-        // Get polis with calculated kuota_tersisa
-        $polis = Polis::where('is_active', true)
+        $notifications = Notifikasi::whereHas('antrean', function ($q) use ($pasien) {
+            if ($pasien) $q->where('idpasien', $pasien->idpasien);
+        })->latest()->take(5)->get();
+
+        $polis = Poli::where('statusbuka', 'buka')
             ->get()
             ->map(function ($p) {
-                // Count antreans for this poli today
-                $terisi = Antrean::where('poli_id', $p->id)
-                    ->whereDate('tanggal', today())
-                    ->whereIn('status', ['menunggu','dipanggil'])
-                    ->count();
-                $p->kuota_tersisa = max(0, $p->kuota_harian - $terisi);
+                $terisi = Antrean::whereHas('jadwal', function ($q) use ($p) {
+                    $q->where('idpoli', $p->idpoli)->where('tanggal', today());
+                })->whereIn('status', ['menunggu', 'dipanggil'])->count();
+                $p->kuota_tersisa = max(0, $p->kuotaharian - $terisi);
                 return $p;
             });
 
-        return view('patient.home', compact('user', 'activeQueue', 'notifications', 'polis'));
+        return view('patient.home', compact('pengguna', 'pasien', 'activeQueue', 'notifications', 'polis'));
     }
 
     public function ambilAntrean()
     {
-        $polis = Polis::where('is_active', true)->get();
+        $polis = Poli::where('statusbuka', 'buka')->get();
         return view('patient.ambil-antrean', compact('polis'));
     }
 
     public function getDokterByPoli(Request $request)
     {
-        $doctors = Doctor::where('poli_id', $request->poli_id)
-            ->where('is_active', true)
-            ->with('user')
+        $dokters = JadwalLayanan::where('idpoli', $request->poli_id)
+            ->where('status', 'aktif')
+            ->whereDate('tanggal', '>=', today())
+            ->with('dokter')
             ->get()
+            ->pluck('dokter')
+            ->unique('iddokter')
+            ->values()
             ->map(fn($d) => [
-                'id'           => $d->id,
-                'nama'         => $d->user->name,
-                'spesialisasi' => $d->spesialisasi,
-                'rating'       => $d->rating,
-                'total_pasien' => $d->total_pasien,
-                'foto'         => $d->foto,
+                'id'           => $d->iddokter,
+                'nama'         => $d->namadokter,
+                'spesialisasi' => $d->jenisdokter,
             ]);
-        return response()->json($doctors);
+        return response()->json($dokters);
     }
 
     public function getJadwalByDokter(Request $request)
     {
-        $jadwals = JadwalDokter::where('doctor_id', $request->doctor_id)
-            ->where('is_active', true)
+        $jadwals = JadwalLayanan::where('iddokter', $request->doctor_id)
+            ->where('status', 'aktif')
             ->whereDate('tanggal', '>=', today())
-            ->where('terisi', '<', DB::raw('kuota'))
+            ->whereColumn('kuotaterisi', '<', 'kuotamaksimal')
             ->orderBy('tanggal')
             ->get()
             ->map(fn($j) => [
-                'id'         => $j->id,
-                'tanggal'    => $j->tanggal->format('d M Y'),
-                'tanggal_raw'=> $j->tanggal->format('Y-m-d'),
-                'jam_mulai'  => $j->jam_mulai,
-                'jam_selesai'=> $j->jam_selesai,
-                'sisa_kuota' => $j->sisaKuota(),
+                'id'          => $j->idjadwal,
+                'tanggal'     => $j->tanggal->format('d M Y'),
+                'tanggal_raw' => $j->tanggal->format('Y-m-d'),
+                'jam_mulai'   => '08:00',
+                'jam_selesai' => '14:00',
+                'sisa_kuota'  => $j->sisaKuota(),
             ]);
         return response()->json($jadwals);
     }
@@ -88,81 +102,84 @@ class PatientController extends Controller
     public function storeAntrean(Request $request)
     {
         $request->validate([
-            'poli_id'   => 'required|exists:polis,id',
-            'doctor_id' => 'required|exists:doctors,id',
-            'jadwal_id' => 'required|exists:jadwal_dokters,id',
+            'poli_id'   => 'required|exists:poli,idpoli',
+            'doctor_id' => 'required|exists:dokter,iddokter',
+            'jadwal_id' => 'required|exists:jadwallayanan,idjadwal',
             'keluhan'   => 'nullable|string|max:500',
         ]);
 
-        $user   = Auth::user();
-        $jadwal = JadwalDokter::findOrFail($request->jadwal_id);
-        $poli   = Polis::findOrFail($request->poli_id);
+        $pengguna = Auth::user();
+        $pasien   = $pengguna->pasien;
+        $jadwal   = JadwalLayanan::findOrFail($request->jadwal_id);
 
         if ($jadwal->isFull()) {
             return back()->withErrors(['jadwal_id' => 'Maaf, kuota jadwal ini sudah penuh.']);
         }
 
-        // Check if user already has queue today for this poli
-        $existing = Antrean::where('user_id', $user->id)
-            ->where('poli_id', $request->poli_id)
-            ->whereDate('tanggal', $jadwal->tanggal)
-            ->whereIn('status', ['menunggu','dipanggil'])
+        // Check existing queue
+        $existing = Antrean::where('idpasien', $pasien->idpasien)
+            ->whereHas('jadwal', fn($q) => $q->where('idpoli', $request->poli_id)->where('tanggal', $jadwal->tanggal))
+            ->whereIn('status', ['menunggu', 'dipanggil'])
             ->first();
         if ($existing) {
             return back()->withErrors(['poli_id' => 'Anda sudah memiliki antrean aktif di poli ini untuk tanggal tersebut.']);
         }
 
-        $nomor = Antrean::generateNomor($poli->kode, $jadwal->tanggal->format('Y-m-d'));
+        $idantrean = 'ANT' . Str::upper(Str::random(7));
+        $nomor = Antrean::generateNomor($request->poli_id, $jadwal->tanggal->format('Y-m-d'));
 
         $antrean = Antrean::create([
-            'user_id'        => $user->id,
-            'poli_id'        => $request->poli_id,
-            'doctor_id'      => $request->doctor_id,
-            'jadwal_id'      => $request->jadwal_id,
-            'nomor_antrean'  => $nomor,
-            'tanggal'        => $jadwal->tanggal,
-            'jam_kedatangan' => $jadwal->jam_mulai,
-            'estimasi_layanan'=> date('H:i', strtotime($jadwal->jam_mulai) + (($jadwal->terisi) * 15 * 60)),
-            'keluhan'        => $request->keluhan,
+            'idantrean'      => $idantrean,
+            'idpasien'       => $pasien->idpasien,
+            'idjadwal'       => $request->jadwal_id,
+            'nomorantrean'   => $nomor,
             'status'         => 'menunggu',
+            'waktudaftar'    => now(),
+            'estimasitunggu' => $jadwal->kuotaterisi * 15,
+            'jenispasien'    => 'UMUM',
         ]);
 
-        // Increment terisi
-        $jadwal->increment('terisi');
+        $jadwal->increment('kuotaterisi');
 
-        // Notify patient
         Notifikasi::create([
-            'user_id' => $user->id,
-            'judul'   => 'Pendaftaran Berhasil',
-            'pesan'   => "Nomor antrean {$nomor} di {$poli->nama} berhasil dikonfirmasi.",
-            'icon'    => 'check_circle',
+            'idnotifikasi'    => 'NTF' . Str::upper(Str::random(7)),
+            'idantrean'       => $idantrean,
+            'jenisnotifikasi' => 'pendaftaran',
+            'pesan'           => "Nomor antrean {$nomor} di {$jadwal->poli->namapoli} berhasil dikonfirmasi.",
+            'statuskirim'     => 'terkirim',
+            'waktukirim'      => now(),
+            'nomortujuan'     => $pasien->nomorhp,
         ]);
 
-        return redirect()->route('patient.tiket', $antrean->id);
+        return redirect()->route('patient.tiket', $antrean->idantrean);
     }
 
     public function tiket(Antrean $antrean)
     {
-        if ($antrean->user_id !== Auth::id()) abort(403);
-        $antrean->load(['poli','doctor.user','jadwal']);
+        $pengguna = Auth::user();
+        if ($antrean->idpasien !== $pengguna->pasien->idpasien) abort(403);
+        $antrean->load(['jadwal.poli', 'jadwal.dokter']);
         return view('patient.tiket', compact('antrean'));
     }
 
     public function batalAntrean(Antrean $antrean)
     {
-        if ($antrean->user_id !== Auth::id()) abort(403);
-        if (!in_array($antrean->status, ['menunggu'])) {
+        $pengguna = Auth::user();
+        if ($antrean->idpasien !== $pengguna->pasien->idpasien) abort(403);
+        if ($antrean->status !== 'menunggu') {
             return back()->withErrors(['status' => 'Antrean tidak dapat dibatalkan.']);
         }
         $antrean->update(['status' => 'batal']);
-        $antrean->jadwal->decrement('terisi');
+        $antrean->jadwal->decrement('kuotaterisi');
         return redirect()->route('patient.home')->with('success', 'Antrean berhasil dibatalkan.');
     }
 
     public function jadwalSaya()
     {
-        $antreans = Antrean::where('user_id', Auth::id())
-            ->with(['poli','doctor.user'])
+        $pengguna = Auth::user();
+        $pasien   = $pengguna->pasien;
+        $antreans = Antrean::where('idpasien', $pasien->idpasien)
+            ->with(['jadwal.poli', 'jadwal.dokter'])
             ->latest()
             ->paginate(10);
         return view('patient.jadwal', compact('antreans'));
