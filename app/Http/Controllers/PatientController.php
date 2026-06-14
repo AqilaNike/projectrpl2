@@ -16,25 +16,14 @@ class PatientController extends Controller
 {
     public function home()
     {
-<<<<<<< HEAD
-        $user = Auth::user();
-        $activeQueue = Antrean::where('user_id', $user->id)
-            ->whereIn('status', ['menunggu', 'dipanggil'])
-            ->whereDate('tanggal', '>=', today())
-            ->orderBy('tanggal', 'asc')
-            ->orderBy('jam_kedatangan', 'asc')
-            ->with(['poli','doctor.user'])
-            ->first();
-=======
         $pengguna = Auth::user();
         $pasien   = $pengguna->pasien;
->>>>>>> 1898eeecec7caa27b4a2bf4b955cdb0bb07b3db6
 
         $activeQueue = null;
         if ($pasien) {
             $activeQueue = Antrean::where('idpasien', $pasien->idpasien)
                 ->whereIn('status', ['menunggu', 'dipanggil'])
-                ->whereHas('jadwal', fn($q) => $q->where('tanggal', today()))
+                ->whereHas('jadwal', fn($q) => $q->whereDate('tanggal', '>=', today()))
                 ->with(['jadwal.poli', 'jadwal.dokter'])
                 ->first();
         }

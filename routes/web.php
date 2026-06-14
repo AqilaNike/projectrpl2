@@ -41,16 +41,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,dokter,p
     // Schedule Management
     Route::get('/jadwal',                             [AdminController::class, 'jadwal'])->name('jadwal');
     Route::post('/jadwal',                            [AdminController::class, 'storeJadwal'])->name('jadwal.store');
-<<<<<<< HEAD
-    Route::post('/poli/{poli}/kuota',                 [AdminController::class, 'updateKuotaPoli'])->name('poli.kuota');
-    Route::post('/poli/{poli}/toggle',                [AdminController::class, 'togglePoli'])->name('poli.toggle');
+    Route::post('/poli/{idpoli}/kuota',               [AdminController::class, 'updateKuotaPoli'])->name('poli.kuota');
+    Route::post('/poli/{idpoli}/toggle',              [AdminController::class, 'togglePoli'])->name('poli.toggle');
 
     // Extra Pages
     Route::get('/notifikasi',                         [AdminController::class, 'notifikasi'])->name('notifikasi');
     Route::get('/pengaturan',                         [AdminController::class, 'pengaturan'])->name('pengaturan');
-=======
-    Route::post('/poli/{idpoli}/kuota',               [AdminController::class, 'updateKuotaPoli'])->name('poli.kuota');
-    Route::post('/poli/{idpoli}/toggle',              [AdminController::class, 'togglePoli'])->name('poli.toggle');
 
     // Registrasi Offline
     Route::get('/registrasi',                         [AdminController::class, 'registrasi'])->name('registrasi');
@@ -62,5 +58,4 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,dokter,p
 
     // Laporan
     Route::get('/laporan',                            [AdminController::class, 'laporan'])->name('laporan');
->>>>>>> 1898eeecec7caa27b4a2bf4b955cdb0bb07b3db6
 });

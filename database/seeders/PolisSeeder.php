@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Polis;
+use App\Models\Poli;
 use Illuminate\Database\Seeder;
 
 class PolisSeeder extends Seeder
@@ -11,49 +11,58 @@ class PolisSeeder extends Seeder
     {
         $polis = [
             [
-                'nama' => 'Poli Umum',
-                'kode' => 'U',
-                'lokasi' => 'Lt. 1 Gedung A',
-                'icon' => 'clinic',
-                'is_active' => true,
-                'kuota_harian' => 30,
-                'jam_buka' => '07:30:00',
-                'jam_tutup' => '14:00:00',
+                'idpoli' => 'P-UMUM',
+                'namapoli' => 'Poli Umum',
+                'kuotaharian' => 30,
+                'statusbuka' => 'buka',
+                'jamoperasional' => '07:30-14:00',
             ],
             [
-                'nama' => 'Poli Gigi',
-                'kode' => 'G',
-                'lokasi' => 'Lt. 1 Gedung B',
-                'icon' => 'dentistry',
-                'is_active' => true,
-                'kuota_harian' => 20,
-                'jam_buka' => '07:30:00',
-                'jam_tutup' => '14:00:00',
+                'idpoli' => 'P-GIGI',
+                'namapoli' => 'Poli Gigi',
+                'kuotaharian' => 20,
+                'statusbuka' => 'buka',
+                'jamoperasional' => '07:30-14:00',
             ],
             [
-                'nama' => 'Poli KIA',
-                'kode' => 'K',
-                'lokasi' => 'Lt. 2 Gedung A',
-                'icon' => 'favorite',
-                'is_active' => true,
-                'kuota_harian' => 25,
-                'jam_buka' => '07:30:00',
-                'jam_tutup' => '14:00:00',
+                'idpoli' => 'P-KIA',
+                'namapoli' => 'Poli KIA/KB',
+                'kuotaharian' => 25,
+                'statusbuka' => 'buka',
+                'jamoperasional' => '07:30-14:00',
             ],
             [
-                'nama' => 'Poli Imunisasi',
-                'kode' => 'I',
-                'lokasi' => 'Lt. 1 Gedung C',
-                'icon' => 'vaccines',
-                'is_active' => true,
-                'kuota_harian' => 30,
-                'jam_buka' => '07:30:00',
-                'jam_tutup' => '14:00:00',
+                'idpoli' => 'P-MTBS',
+                'namapoli' => 'Poli MTBS',
+                'kuotaharian' => 20,
+                'statusbuka' => 'buka',
+                'jamoperasional' => '07:30-14:00',
             ],
+            [
+                'idpoli' => 'P-GIZI',
+                'namapoli' => 'Poli Gizi',
+                'kuotaharian' => 15,
+                'statusbuka' => 'buka',
+                'jamoperasional' => '07:30-14:00',
+            ],
+            [
+                'idpoli' => 'P-KHUSUS',
+                'namapoli' => 'Layanan Khusus',
+                'kuotaharian' => 15,
+                'statusbuka' => 'buka',
+                'jamoperasional' => '07:30-14:00',
+            ],
+            [
+                'idpoli' => 'P-TB',
+                'namapoli' => 'Poli TB/ISPA',
+                'kuotaharian' => 10,
+                'statusbuka' => 'buka',
+                'jamoperasional' => '07:30-14:00',
+            ]
         ];
 
         foreach ($polis as $poli) {
-            Polis::create($poli);
+            Poli::updateOrCreate(['idpoli' => $poli['idpoli']], $poli);
         }
     }
 }
