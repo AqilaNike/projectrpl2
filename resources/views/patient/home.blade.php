@@ -18,7 +18,7 @@
             <div>
                 <h1 class="text-2xl md:text-4xl font-bold text-on-surface">Selamat Datang, {{ auth()->user()->name }}</h1>
                 <p class="text-base text-on-surface-variant mt-2">
-                    @if($activeQueue) Anda memiliki antrean aktif hari ini.
+                    @if($activeQueue) Anda memiliki antrean aktif.
                     @else Belum ada antrean aktif. Silakan ambil antrean baru.
                     @endif
                 </p>
@@ -37,6 +37,10 @@
                             <span class="text-xl text-on-primary-container/80">{{ $activeQueue->poli->nama }}</span>
                         </div>
                         <div class="flex items-center gap-2 mt-2 text-on-primary-container">
+                            <span class="material-symbols-outlined text-sm">event</span>
+                            <span class="text-base font-medium">{{ \Carbon\Carbon::parse($activeQueue->tanggal)->translatedFormat('l, d F Y') }}</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1 text-on-primary-container">
                             <span class="material-symbols-outlined text-sm">schedule</span>
                             <span class="text-base font-medium">Estimasi Dipanggil: {{ $activeQueue->estimasi_layanan ?? '-' }} WIB</span>
                         </div>

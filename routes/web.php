@@ -44,6 +44,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,doctor']
     Route::post('/jadwal',                            [AdminController::class, 'storeJadwal'])->name('jadwal.store');
     Route::post('/poli/{poli}/kuota',                 [AdminController::class, 'updateKuotaPoli'])->name('poli.kuota');
     Route::post('/poli/{poli}/toggle',                [AdminController::class, 'togglePoli'])->name('poli.toggle');
+
+    // Extra Pages
+    Route::get('/notifikasi',                         [AdminController::class, 'notifikasi'])->name('notifikasi');
+    Route::get('/pengaturan',                         [AdminController::class, 'pengaturan'])->name('pengaturan');
 });
 
 

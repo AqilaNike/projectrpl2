@@ -4,7 +4,7 @@
 
 @section('content')
 @include('layouts.admin-sidebar')
-<main class="pt-24 pb-20 px-4 md:px-16 max-w-7xl mx-auto">
+<main class="flex-1 md:ml-64 pt-8 pb-20 px-4 md:px-8 min-h-screen">
     <div class="rounded-3xl bg-surface-container p-6 shadow-sm border border-outline-variant">
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
@@ -71,25 +71,33 @@
         <main class="flex-1 flex overflow-hidden p-8 gap-8">
             {{-- Left: Current calling number --}}
             <section class="flex-[3] flex flex-col gap-6">
-                <div class="bg-white rounded-[32px] shadow-lg border border-outline-variant flex-1 flex flex-col items-center justify-center relative overflow-hidden">
+                <div class="bg-white rounded-[32px] shadow-lg border border-outline-variant flex-1 flex flex-col items-center justify-between p-8 relative overflow-hidden">
                     @if($dipanggil)
-                    <div class="absolute top-8 left-8 bg-primary text-white px-8 py-3 rounded-full flex items-center gap-3"
-                         style="animation:pulse-custom 2s infinite ease-in-out">
-                        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">volume_up</span>
-                        <span class="text-sm font-black uppercase tracking-widest">Sekarang Dipanggil</span>
-                    </div>
-                    <div class="text-center">
-                        <h2 class="text-on-surface-variant text-sm font-bold uppercase tracking-[0.2em] mb-4">Nomor Antrean</h2>
-                        <div class="text-[180px] leading-none font-black text-primary tracking-tighter drop-shadow-sm">{{ $dipanggil->nomor_antrean }}</div>
-                        <div class="mt-8 flex items-center justify-center gap-4 text-primary bg-primary-container/20 px-10 py-5 rounded-2xl border border-primary/10">
-                            <span class="material-symbols-outlined text-5xl">{{ $dipanggil->poli->icon }}</span>
-                            <span class="text-5xl font-bold leading-none">{{ $dipanggil->poli->nama }}</span>
+                    
+                    {{-- Header / Badge --}}
+                    <div class="w-full flex justify-start z-10">
+                        <div class="bg-primary text-white px-6 py-3 rounded-full flex items-center gap-3"
+                             style="animation:pulse-custom 2s infinite ease-in-out">
+                            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">volume_up</span>
+                            <span class="text-sm font-black uppercase tracking-widest">Sekarang Dipanggil</span>
                         </div>
                     </div>
-                    <div class="absolute bottom-12 w-full text-center">
-                        <div class="inline-flex items-center gap-4 px-12 py-4 rounded-full border" style="background-color:rgba(0,108,73,.1);border-color:rgba(0,108,73,.2);color:#006c49">
-                            <span class="material-symbols-outlined text-3xl" style="font-variation-settings:'FILL' 1">login</span>
-                            <span class="text-2xl font-bold">Silakan Menuju Ruang Periksa</span>
+
+                    {{-- Main Number --}}
+                    <div class="text-center my-auto flex flex-col items-center justify-center z-10 py-4">
+                        <h2 class="text-on-surface-variant text-sm font-bold uppercase tracking-[0.2em] mb-4">Nomor Antrean</h2>
+                        <div class="text-[100px] xl:text-[180px] leading-none font-black text-primary tracking-tighter drop-shadow-sm">{{ $dipanggil->nomor_antrean }}</div>
+                        <div class="mt-6 xl:mt-8 flex items-center justify-center gap-4 text-primary bg-primary-container/20 px-8 py-4 xl:px-10 xl:py-5 rounded-2xl border border-primary/10">
+                            <span class="material-symbols-outlined text-4xl xl:text-5xl">{{ $dipanggil->poli->icon }}</span>
+                            <span class="text-3xl xl:text-5xl font-bold leading-none">{{ $dipanggil->poli->nama }}</span>
+                        </div>
+                    </div>
+
+                    {{-- Footer / Instruction --}}
+                    <div class="w-full text-center z-10">
+                        <div class="inline-flex items-center gap-3 xl:gap-4 px-6 xl:px-12 py-3 xl:py-4 rounded-full border" style="background-color:rgba(0,108,73,.1);border-color:rgba(0,108,73,.2);color:#006c49">
+                            <span class="material-symbols-outlined text-2xl xl:text-3xl" style="font-variation-settings:'FILL' 1">login</span>
+                            <span class="text-lg xl:text-2xl font-bold">Silakan Menuju Ruang Periksa</span>
                         </div>
                     </div>
                     @else
@@ -113,13 +121,13 @@
 
                 @forelse($berikutnya as $ant)
                 @php $colors=['border-l-primary','border-l-secondary','border-l-tertiary']; $c=$colors[$loop->index % 3]; @endphp
-                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-8 {{ $c }} border border-outline-variant flex items-center justify-between hover:scale-[1.02] transition-all">
-                    <div>
-                        <p class="text-xs font-bold text-on-surface-variant uppercase">{{ $ant->poli->nama }}</p>
-                        <p class="text-5xl font-black text-on-surface leading-tight">{{ $ant->nomor_antrean }}</p>
+                <div class="bg-white p-4 xl:p-6 rounded-2xl shadow-sm border-l-8 {{ $c }} border border-outline-variant flex items-center justify-between hover:scale-[1.02] transition-all">
+                    <div class="min-w-0 pr-4">
+                        <p class="text-xs font-bold text-on-surface-variant uppercase truncate">{{ $ant->poli->nama }}</p>
+                        <p class="text-4xl xl:text-5xl font-black text-on-surface leading-tight whitespace-nowrap">{{ $ant->nomor_antrean }}</p>
                     </div>
-                    <div class="bg-surface-container p-3 rounded-xl">
-                        <span class="material-symbols-outlined text-primary text-3xl">{{ $ant->poli->icon }}</span>
+                    <div class="bg-surface-container p-3 rounded-xl shrink-0">
+                        <span class="material-symbols-outlined text-primary text-2xl xl:text-3xl">{{ $ant->poli->icon }}</span>
                     </div>
                 </div>
                 @empty

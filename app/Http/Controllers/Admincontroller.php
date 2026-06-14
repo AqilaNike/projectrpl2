@@ -143,4 +143,20 @@ class AdminController extends Controller
         $poli->update(['is_active' => !$poli->is_active]);
         return response()->json(['success' => true, 'is_active' => $poli->is_active]);
     }
+    public function notifikasi()
+    {
+        $notifications = [
+            ['id' => 1, 'type' => 'info', 'icon' => 'info', 'title' => 'Pembaruan Sistem v2.1', 'message' => 'Sistem telah diperbarui dengan fitur monitoring terbaru.', 'time' => '10 menit yang lalu', 'read' => false],
+            ['id' => 2, 'type' => 'success', 'icon' => 'check_circle', 'title' => 'Laporan Harian Selesai', 'message' => 'Laporan antrean pasien hari ini telah berhasil di-generate.', 'time' => '1 jam yang lalu', 'read' => false],
+            ['id' => 3, 'type' => 'warning', 'icon' => 'warning', 'title' => 'Poli Gigi Sedang Ramai', 'message' => 'Antrean Poli Gigi melebihi rata-rata harian (25 pasien).', 'time' => '3 jam yang lalu', 'read' => true],
+            ['id' => 4, 'type' => 'error', 'icon' => 'error', 'title' => 'Printer Tiket Error', 'message' => 'Koneksi ke printer di lobi utama terputus. Mohon periksa jaringan.', 'time' => 'Kemarin', 'read' => true],
+        ];
+        return view('admin.notifikasi', compact('notifications'));
+    }
+
+    public function pengaturan()
+    {
+        $user = auth()->user();
+        return view('admin.pengaturan', compact('user'));
+    }
 }

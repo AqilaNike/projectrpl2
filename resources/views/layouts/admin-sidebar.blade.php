@@ -19,17 +19,17 @@
         @php
             $currentRoute = request()->route()->getName();
             $navItems = [
-                ['route' => 'admin.dashboard', 'icon' => 'dashboard',            'label' => 'Dashboard'],
-                ['route' => 'admin.antrean',   'icon' => 'group',                'label' => 'Data Antrean'],
-                ['route' => 'admin.jadwal',    'icon' => 'event_note',           'label' => 'Jadwal Layanan'],
-                ['route' => 'admin.monitor',   'icon' => 'monitoring',           'label' => 'Monitor Antrean'],
-                ['route' => 'admin.dashboard', 'icon' => 'notifications',        'label' => 'Notifikasi'],
-                ['route' => 'admin.dashboard', 'icon' => 'settings',             'label' => 'Pengaturan'],
+                ['route' => 'admin.dashboard', 'href' => route('admin.dashboard'), 'icon' => 'dashboard',            'label' => 'Dashboard'],
+                ['route' => 'admin.antrean',   'href' => route('admin.antrean'),   'icon' => 'group',                'label' => 'Data Antrean'],
+                ['route' => 'admin.jadwal',    'href' => route('admin.jadwal'),    'icon' => 'event_note',           'label' => 'Jadwal Layanan'],
+                ['route' => 'admin.monitor',   'href' => route('admin.monitor'),   'icon' => 'monitoring',           'label' => 'Monitor Antrean'],
+                ['route' => 'admin.notifikasi',    'href' => route('admin.notifikasi'),  'icon' => 'notifications',        'label' => 'Notifikasi'],
+                ['route' => 'admin.pengaturan',    'href' => route('admin.pengaturan'),  'icon' => 'settings',             'label' => 'Pengaturan'],
             ];
         @endphp
         @foreach($navItems as $item)
-            @php $isActive = str_starts_with($currentRoute, $item['route']); @endphp
-            <a href="{{ route($item['route']) }}"
+            @php $isActive = $item['route'] ? str_starts_with($currentRoute, $item['route']) : false; @endphp
+            <a href="{{ $item['href'] }}"
                class="{{ $isActive ? 'bg-primary-container text-on-primary-container shadow-sm' : 'text-on-surface-variant hover:bg-surface-variant/50 hover:translate-x-1' }} mx-2 flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200">
                 <span class="material-symbols-outlined" style="{{ $isActive ? 'font-variation-settings: FILL 1' : '' }}">{{ $item['icon'] }}</span>
                 <span class="text-label-lg">{{ $item['label'] }}</span>

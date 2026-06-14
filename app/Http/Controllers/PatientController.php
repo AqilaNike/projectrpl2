@@ -18,7 +18,9 @@ class PatientController extends Controller
         $user = Auth::user();
         $activeQueue = Antrean::where('user_id', $user->id)
             ->whereIn('status', ['menunggu', 'dipanggil'])
-            ->whereDate('tanggal', today())
+            ->whereDate('tanggal', '>=', today())
+            ->orderBy('tanggal', 'asc')
+            ->orderBy('jam_kedatangan', 'asc')
             ->with(['poli','doctor.user'])
             ->first();
 
