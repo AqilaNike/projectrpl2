@@ -4,7 +4,7 @@
 
 @section('content')
 @include('layouts.admin-sidebar')
-<main class="pt-24 pb-20 px-4 md:px-16 max-w-7xl mx-auto">
+<main class="pt-24 pb-20 px-4 md:px-16 max-w-7xl mx-auto md:ml-64">
     <div class="rounded-3xl bg-surface-container p-6 shadow-sm border border-outline-variant">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -28,8 +28,8 @@
                             <label class="block text-sm font-medium text-on-surface-variant">Dokter</label>
                             <select name="doctor_id" class="mt-2 w-full rounded-2xl border border-outline-variant px-4 py-3">
                                 <option value="">Pilih Dokter</option>
-                                @foreach($doctors as $doctor)
-                                    <option value="{{ $doctor->id }}">{{ $doctor->user->name }} ({{ $doctor->spesialisasi }})</option>
+                                @foreach($dokters as $dokter)
+                                    <option value="{{ $dokter->iddokter }}">{{ $dokter->namadokter }} ({{ $dokter->jenisdokter }})</option>
                                 @endforeach
                             </select>
                         </div>
@@ -38,7 +38,7 @@
                             <select name="poli_id" class="mt-2 w-full rounded-2xl border border-outline-variant px-4 py-3">
                                 <option value="">Pilih Poli</option>
                                 @foreach($polis as $poli)
-                                    <option value="{{ $poli->id }}">{{ $poli->nama }}</option>
+                                    <option value="{{ $poli->idpoli }}">{{ $poli->namapoli }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -84,11 +84,11 @@
                         <tbody class="divide-y divide-outline-variant bg-white">
                             @forelse($jadwals as $jadwal)
                                 <tr>
-                                    <td class="px-4 py-3">{{ $jadwal->doctor->user->name }}</td>
-                                    <td class="px-4 py-3">{{ $jadwal->poli->nama }}</td>
+                                    <td class="px-4 py-3">{{ $jadwal->dokter->namadokter }}</td>
+                                    <td class="px-4 py-3">{{ $jadwal->poli->namapoli }}</td>
                                     <td class="px-4 py-3">{{ $jadwal->tanggal->format('d M Y') }}</td>
                                     <td class="px-4 py-3">{{ $jadwal->jam_mulai }} - {{ $jadwal->jam_selesai }}</td>
-                                    <td class="px-4 py-3">{{ $jadwal->kuota }}</td>
+                                    <td class="px-4 py-3">{{ $jadwal->kuotamaksimal }}</td>
                                 </tr>
                             @empty
                                 <tr>
@@ -111,24 +111,24 @@
 
             <div class="mt-6 space-y-4">
                 @foreach($polis as $poli)
-                    <div data-poli-id="{{ $poli->id }}" data-poli-kode="{{ $poli->kode }}" class="rounded-3xl bg-surface-container p-4 grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
+                    <div data-poli-id="{{ $poli->idpoli }}" data-poli-kode="{{ $poli->idpoli }}" class="rounded-3xl bg-surface-container p-4 grid gap-4 md:grid-cols-[1fr_360px] md:items-center">
                         <div>
-                            <p class="font-semibold text-on-surface">{{ $poli->nama }}</p>
+                            <p class="font-semibold text-on-surface">{{ $poli->namapoli }}</p>
                             <p class="text-sm text-on-surface-variant">
-                                <span class="poli-kuota-text">Kode {{ $poli->kode }} • Kuota harian {{ $poli->kuota_harian }}</span>
-                                • <span class="poli-status-text">{{ $poli->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                                <span class="poli-kuota-text">ID {{ $poli->idpoli }} • Kuota harian {{ $poli->kuotaharian }}</span>
+                                • <span class="poli-status-text">{{ ($poli->statusbuka === 'buka') ? 'Aktif' : 'Nonaktif' }}</span>
                             </p>
                         </div>
-                        <div class="flex flex-col gap-3 md:flex-row md:items-center">
-                            <form action="{{ route('admin.poli.kuota', $poli->id) }}" method="POST" class="flex gap-2">
+                        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-end">
+                            <form action="{{ route('admin.poli.kuota', $poli->idpoli) }}" method="POST" class="flex gap-2">
                                 @csrf
-                                <input type="number" name="kuota_harian" value="{{ $poli->kuota_harian }}" min="1" class="w-24 rounded-2xl border border-outline-variant px-3 py-2" />
-                                <button type="submit" class="rounded-2xl bg-primary px-4 py-2 text-white text-sm font-semibold">Simpan</button>
+                                <input type="number" name="kuota_harian" value="{{ $poli->kuotaharian }}" min="1" class="w-24 rounded-2xl border border-outline-variant px-3 py-2" />
+                                <button type="submit" class="rounded-2xl bg-primary px-4 py-2 text-white text-sm font-semibold whitespace-nowrap">Simpan</button>
                             </form>
-                            <form action="{{ route('admin.poli.toggle', $poli->id) }}" method="POST">
+                            <form action="{{ route('admin.poli.toggle', $poli->idpoli) }}" method="POST">
                                 @csrf
-                                <button type="submit" class="rounded-2xl {{ $poli->is_active ? 'bg-error-container text-on-error-container' : 'bg-secondary text-white' }} px-4 py-2 text-sm font-semibold">
-                                    {{ $poli->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                                <button type="submit" class="rounded-2xl min-w-[120px] {{ ($poli->statusbuka === 'buka') ? 'bg-error-container text-on-error-container' : 'bg-secondary text-white' }} px-4 py-2 text-sm font-semibold">
+                                    {{ ($poli->statusbuka === 'buka') ? 'Nonaktifkan' : 'Aktifkan' }}
                                 </button>
                             </form>
                         </div>
@@ -206,7 +206,7 @@
                         if (parent) {
                             const kuotaText = parent.querySelector('.poli-kuota-text');
                             if (kuotaText) {
-                                kuotaText.textContent = `Kode ${parent.dataset.poliKode} • Kuota harian ${data.kuota}`;
+                                kuotaText.textContent = `ID ${parent.dataset.poliKode} • Kuota harian ${data.kuota}`;
                             }
                         }
                         showAdminToast('Kuota harian disimpan', 'success');

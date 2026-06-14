@@ -33,8 +33,8 @@
                             {{ strtoupper($activeQueue->status) === 'MENUNGGU' ? 'ANTREAN BERJALAN' : 'SEDANG DIPANGGIL' }}
                         </span>
                         <div class="flex items-baseline gap-4">
-                            <h2 class="text-6xl font-black text-on-primary-container">{{ $activeQueue->nomor_antrean }}</h2>
-                            <span class="text-xl text-on-primary-container/80">{{ $activeQueue->poli->nama }}</span>
+                            <h2 class="text-6xl font-black text-on-primary-container">{{ $activeQueue->nomorantrean }}</h2>
+                            <span class="text-xl text-on-primary-container/80">{{ $activeQueue->jadwal->poli->namapoli }}</span>
                         </div>
                         <div class="flex items-center gap-2 mt-2 text-on-primary-container">
                             <span class="material-symbols-outlined text-sm">schedule</span>
@@ -104,9 +104,9 @@
             @foreach($polis as $poli)
             <div class="group bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all {{ !$poli->is_active ? 'opacity-70' : '' }}">
                 <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <span class="material-symbols-outlined text-primary">{{ $poli->icon }}</span>
+                    <span class="material-symbols-outlined text-primary">{{ 'medical_services' }}</span>
                 </div>
-                <h3 class="font-bold text-on-surface mb-1">{{ $poli->nama }}</h3>
+                <h3 class="font-bold text-on-surface mb-1">{{ $poli->namapoli }}</h3>
                 <div class="flex items-center gap-2 mb-6">
                     @if(!$poli->is_active || $poli->kuota_tersisa <= 0)
                         <span class="w-2 h-2 rounded-full bg-red-500"></span>
@@ -120,7 +120,7 @@
                     @endif
                 </div>
                 @if($poli->is_active && $poli->kuota_tersisa > 0)
-                    <a href="{{ route('patient.ambil-antrean') }}?poli={{ $poli->id }}"
+                    <a href="{{ route('patient.ambil-antrean') }}?poli={{ $poli->idpoli }}"
                        class="block w-full py-2 text-primary font-bold border border-primary/20 rounded-lg group-hover:bg-primary group-hover:text-white transition-colors text-center text-sm">
                         Pilih
                     </a>

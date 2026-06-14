@@ -1,21 +1,28 @@
 <?php
 namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
-
 class Antrean extends Model
 {
+    protected $table = 'antrean';
+    protected $primaryKey = 'idantrean';
+    public $incrementing = false;
+    protected $keyType = 'string';
     protected $fillable = [
-        'user_id','poli_id','doctor_id','jadwal_id',
-        'nomor_antrean','tanggal','jam_kedatangan','estimasi_layanan',
-        'status','keluhan','qr_code','dipanggil_at','selesai_at',
+        'idantrean', 'idpasien', 'idjadwal', 'idpetugas',
+        'nomorantrean', 'status', 'alasanbatal',
+        'waktudaftar', 'waktupanggil', 'waktuselesai',
+        'estimasitunggu', 'jenispasien',
     ];
-    protected $casts = ['tanggal' => 'date', 'dipanggil_at' => 'datetime', 'selesai_at' => 'datetime'];
-
-    public function user()   { return $this->belongsTo(User::class); }
-    public function poli()   { return $this->belongsTo(Polis::class); }
-    public function doctor() { return $this->belongsTo(Doctor::class); }
-    public function jadwal() { return $this->belongsTo(JadwalDokter::class, 'jadwal_id'); }
-
+    protected $casts = [
+        'waktudaftar'   => 'datetime',
+        'waktupanggil'  => 'datetime',
+        'waktuselesai'  => 'datetime',
+    ];
+    public function pasien()  { return $this->belongsTo(Pasien::class, 'idpasien', 'idpasien'); }
+    public function jadwal()  { return $this->belongsTo(JadwalLayanan::class, 'idjadwal', 'idjadwal'); }
+    public function petugas() { return $this->belongsTo(Petugas::class, 'idpetugas', 'idpetugas'); }
+    public function notifikasis() { return $this->hasMany(Notifikasi::class, 'idantrean', 'idantrean'); }
+    public function rekammedis()  { return $this->hasOne(RekamMedis::class, 'idantrean', 'idantrean'); }
     public function statusBadgeClass(): string
     {
         return match($this->status) {
@@ -26,14 +33,13 @@ class Antrean extends Model
             default     => 'bg-outline-variant text-on-surface',
         };
     }
-
-    public static function generateNomor(string $kode, string $tanggal): string
+    public static function generateNomor(string $idpoli, string $tanggal): string
     {
-        $lastToday = self::where('poli_id', function($q) use ($kode) {
-                $q->select('id')->from('polis')->where('kode', $kode)->limit(1);
-            })
-            ->whereDate('tanggal', $tanggal)
-            ->count();
-        return $kode . '-' . str_pad($lastToday + 1, 3, '0', STR_PAD_LEFT);
+        $poli = Poli::find($idpoli);
+        $kode = strtoupper(substr($poli->namapoli, -1));
+        $count = self::whereHas('jadwal', function ($q) use ($idpoli, $tanggal) {
+            $q->where('idpoli', $idpoli)->where('tanggal', $tanggal);
+        })->count();
+        return $kode . '-' . str_pad($count + 1, 3, '0', STR_PAD_LEFT);
     }
 }

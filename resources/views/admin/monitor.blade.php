@@ -4,7 +4,7 @@
 
 @section('content')
 @include('layouts.admin-sidebar')
-<main class="pt-24 pb-20 px-4 md:px-16 max-w-7xl mx-auto">
+<main class="pt-24 pb-20 px-4 md:px-16 max-w-7xl mx-auto md:ml-64">
     <div class="rounded-3xl bg-surface-container p-6 shadow-sm border border-outline-variant">
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
@@ -20,10 +20,10 @@
                 @if($dipanggil)
                     <div class="mt-6 space-y-3">
                         <p class="text-sm text-on-surface-variant">Nomor antrean</p>
-                        <p class="text-4xl font-bold text-primary">{{ $dipanggil->nomor_antrean }}</p>
-                        <p class="text-sm text-on-surface">Pasien: {{ $dipanggil->user->name }}</p>
-                        <p class="text-sm text-on-surface">Poli: {{ $dipanggil->poli->nama }}</p>
-                        <p class="text-sm text-on-surface">Dokter: {{ $dipanggil->doctor->user->name }}</p>
+                        <p class="text-4xl font-bold text-primary">{{ $dipanggil->nomorantrean }}</p>
+                        <p class="text-sm text-on-surface">Pasien: {{ $dipanggil->pasien->namapasien }}</p>
+                        <p class="text-sm text-on-surface">Poli: {{ $dipanggil->jadwal->poli->namapoli }}</p>
+                        <p class="text-sm text-on-surface">Dokter: {{ $dipanggil->jadwal->dokter->namadokter }}</p>
                     </div>
                 @else
                     <p class="mt-4 text-sm text-on-surface-variant">Belum ada antrean yang sedang dipanggil.</p>
@@ -36,8 +36,8 @@
                     <div class="mt-6 space-y-4">
                         @foreach($berikutnya as $item)
                             <div class="rounded-2xl bg-surface-container p-4">
-                                <p class="font-semibold text-on-surface">{{ $item->nomor_antrean }} — {{ $item->user->name }}</p>
-                                <p class="text-sm text-on-surface-variant">{{ $item->poli->nama }} • {{ $item->tanggal->format('d M Y') }}</p>
+                                <p class="font-semibold text-on-surface">{{ $item->nomorantrean }} — {{ $item->pasien->namapasien }}</p>
+                                <p class="text-sm text-on-surface-variant">{{ $item->jadwal->poli->namapoli }} • {{ $item->jadwal->tanggal->format('d M Y') }}</p>
                             </div>
                         @endforeach
                     </div>
@@ -80,10 +80,10 @@
                     </div>
                     <div class="text-center">
                         <h2 class="text-on-surface-variant text-sm font-bold uppercase tracking-[0.2em] mb-4">Nomor Antrean</h2>
-                        <div class="text-[180px] leading-none font-black text-primary tracking-tighter drop-shadow-sm">{{ $dipanggil->nomor_antrean }}</div>
+                        <div class="text-[180px] leading-none font-black text-primary tracking-tighter drop-shadow-sm">{{ $dipanggil->nomorantrean }}</div>
                         <div class="mt-8 flex items-center justify-center gap-4 text-primary bg-primary-container/20 px-10 py-5 rounded-2xl border border-primary/10">
-                            <span class="material-symbols-outlined text-5xl">{{ $dipanggil->poli->icon }}</span>
-                            <span class="text-5xl font-bold leading-none">{{ $dipanggil->poli->nama }}</span>
+                            <span class="material-symbols-outlined text-5xl">medical_services</span>
+                            <span class="text-5xl font-bold leading-none">{{ $dipanggil->jadwal->poli->namapoli }}</span>
                         </div>
                     </div>
                     <div class="absolute bottom-12 w-full text-center">
@@ -115,11 +115,11 @@
                 @php $colors=['border-l-primary','border-l-secondary','border-l-tertiary']; $c=$colors[$loop->index % 3]; @endphp
                 <div class="bg-white p-6 rounded-2xl shadow-sm border-l-8 {{ $c }} border border-outline-variant flex items-center justify-between hover:scale-[1.02] transition-all">
                     <div>
-                        <p class="text-xs font-bold text-on-surface-variant uppercase">{{ $ant->poli->nama }}</p>
-                        <p class="text-5xl font-black text-on-surface leading-tight">{{ $ant->nomor_antrean }}</p>
+                        <p class="text-xs font-bold text-on-surface-variant uppercase">{{ $ant->jadwal->poli->namapoli }}</p>
+                        <p class="text-5xl font-black text-on-surface leading-tight">{{ $ant->nomorantrean }}</p>
                     </div>
                     <div class="bg-surface-container p-3 rounded-xl">
-                        <span class="material-symbols-outlined text-primary text-3xl">{{ $ant->poli->icon }}</span>
+                        <span class="material-symbols-outlined text-primary text-3xl">medical_services</span>
                     </div>
                 </div>
                 @empty

@@ -58,7 +58,7 @@
                 <div class="h-56 flex items-end justify-between gap-3">
                     @foreach($chartData as $day)
                     @php $pct = $maxCount > 0 ? max(8, round(($day['count']/$maxCount)*100)) : 8; @endphp
-                    <div class="flex-1 flex flex-col items-center gap-2">
+                    <div class="flex-1 h-full flex flex-col justify-end items-center gap-2">
                         <span class="text-xs font-bold text-on-surface-variant">{{ $day['count'] }}</span>
                         <div class="w-full rounded-t-lg transition-all hover:brightness-110"
                              style="height:{{ $pct }}%; background-color:{{ $day['label'] === now()->isoFormat('ddd') ? '#004ac6' : '#d3e4fe' }}"></div>
@@ -74,14 +74,14 @@
                     <span class="material-symbols-outlined text-primary text-[18px]">stethoscope</span> Dokter Bertugas
                 </h3>
                 <div class="space-y-4">
-                    @foreach($doctors->take(4) as $doc)
+                    @foreach($dokters->take(4) as $doc)
                     <div class="flex items-center gap-3 group">
                         <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
                             <span class="material-symbols-outlined text-on-primary-container text-lg">account_circle</span>
                         </div>
                         <div class="flex-1">
-                            <p class="text-sm font-bold text-on-surface">{{ $doc->user->name }}</p>
-                            <p class="text-xs text-on-surface-variant">{{ $doc->poli->nama }} • <span class="text-secondary font-medium">Aktif</span></p>
+                            <p class="text-sm font-bold text-on-surface">{{ $doc->namadokter }}</p>
+                            <p class="text-xs text-on-surface-variant">{{ $doc->jenisdokter }} • <span class="text-secondary font-medium">Aktif</span></p>
                         </div>
                     </div>
                     @endforeach
@@ -94,18 +94,18 @@
         </div>
 
         {{-- Quick Actions --}}
-        <div>
+        <div class="relative z-10">
             <h3 class="text-2xl font-bold text-on-surface mb-4">Tindakan Cepat</h3>
             <div class="grid grid-cols-3 md:grid-cols-6 gap-4">
                 @foreach([
-                    ['route'=>'admin.antrean','icon'=>'group','label'=>'Data Antrean'],
-                    ['route'=>'admin.jadwal','icon'=>'event_note','label'=>'Jadwal'],
-                    ['route'=>'admin.monitor','icon'=>'monitoring','label'=>'Monitor'],
-                    ['route'=>'admin.antrean','icon'=>'person_add','label'=>'Registrasi'],
-                    ['route'=>'admin.antrean','icon'=>'confirmation_number','label'=>'Cetak Nomor'],
-                    ['route'=>'admin.dashboard','icon'=>'bar_chart_4_bars','label'=>'Laporan'],
+                    ['url'=>route('admin.antrean'),'icon'=>'group','label'=>'Data Antrean'],
+                    ['url'=>route('admin.jadwal'),'icon'=>'event_note','label'=>'Jadwal'],
+                    ['url'=>route('admin.monitor'),'icon'=>'monitoring','label'=>'Monitor'],
+                    ['url'=>route('admin.registrasi'),'icon'=>'person_add','label'=>'Registrasi'],
+                    ['url'=>route('admin.cetak'),'icon'=>'confirmation_number','label'=>'Cetak Nomor'],
+                    ['url'=>route('admin.laporan'),'icon'=>'bar_chart_4_bars','label'=>'Laporan'],
                 ] as $action)
-                <a href="{{ route($action['route']) }}"
+                <a href="{{ $action['url'] }}"
                    class="flex flex-col items-center justify-center p-5 bg-white rounded-2xl shadow-sm border border-outline-variant/30 hover:border-primary hover:text-primary transition-all group text-on-surface-variant">
                     <span class="material-symbols-outlined mb-2 text-3xl group-hover:scale-110 transition-transform">{{ $action['icon'] }}</span>
                     <span class="text-xs font-semibold text-center">{{ $action['label'] }}</span>
@@ -133,9 +133,9 @@
                     <tbody class="divide-y divide-outline-variant/20">
                         @forelse($recentAnt as $ant)
                         <tr class="hover:bg-primary-container/5 transition-colors">
-                            <td class="px-5 py-4 text-xl font-black text-primary">{{ $ant->nomor_antrean }}</td>
-                            <td class="px-5 py-4"><span class="font-bold text-on-surface text-sm">{{ $ant->user->name }}</span></td>
-                            <td class="px-5 py-4 text-sm text-on-surface">{{ $ant->poli->nama }}</td>
+                            <td class="px-5 py-4 text-xl font-black text-primary">{{ $ant->nomorantrean }}</td>
+                            <td class="px-5 py-4"><span class="font-bold text-on-surface text-sm">{{ $ant->pasien->namapasien }}</span></td>
+                            <td class="px-5 py-4 text-sm text-on-surface">{{ $ant->jadwal->poli->namapoli }}</td>
                             <td class="px-5 py-4">
                                 <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold {{ $ant->statusBadgeClass() }}">
                                     {{ strtoupper($ant->status) }}

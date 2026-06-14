@@ -9,10 +9,10 @@
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
                 <p class="text-label-sm uppercase tracking-[0.25em] text-on-surface-variant">Tiket Antrean</p>
-                <h1 class="text-3xl font-bold text-on-surface">{{ $antrean->nomor_antrean }}</h1>
+                <h1 class="text-3xl font-bold text-on-surface">{{ $antrean->nomorantrean }}</h1>
             </div>
             <div class="rounded-2xl bg-white px-4 py-3 border border-outline-variant text-sm text-on-surface-variant">
-                {{ $antrean->tanggal->format('d M Y') }} • {{ $antrean->jam_kedatangan }}
+                {{ $antrean->jadwal->tanggal->format('d M Y') }} • {{ $antrean->jam_kedatangan }}
             </div>
         </div>
 
@@ -20,7 +20,7 @@
             <div class="rounded-3xl bg-white p-6 border border-outline-variant">
                 <h2 class="text-lg font-semibold text-on-surface">Detail Pasien</h2>
                 <p class="mt-4 text-sm text-on-surface-variant">Nama</p>
-                <p class="font-semibold text-on-surface">{{ $antrean->user->name }}</p>
+                <p class="font-semibold text-on-surface">{{ $antrean->pasien->namapasien }}</p>
                 <p class="mt-4 text-sm text-on-surface-variant">Keluhan</p>
                 <p class="text-on-surface">{{ $antrean->keluhan ?: '-' }}</p>
             </div>
@@ -28,11 +28,11 @@
                 <h2 class="text-lg font-semibold text-on-surface">Detail Layanan</h2>
                 <div class="mt-4 space-y-3 text-sm text-on-surface-variant">
                     <div>
-                        <p class="font-semibold text-on-surface">{{ $antrean->poli->nama }}</p>
+                        <p class="font-semibold text-on-surface">{{ $antrean->jadwal->poli->namapoli }}</p>
                         <p>Poli</p>
                     </div>
                     <div>
-                        <p class="font-semibold text-on-surface">{{ $antrean->doctor->user->name }}</p>
+                        <p class="font-semibold text-on-surface">{{ $antrean->jadwal->dokter->namadokter }}</p>
                         <p>Dokter</p>
                     </div>
                     <div>
@@ -49,7 +49,7 @@
         </div>
 
         @if($antrean->status === 'menunggu')
-            <form action="{{ route('patient.batal-antrean', $antrean->id) }}" method="POST" class="mt-6">
+            <form action="{{ route('patient.batal-antrean', $antrean->idantrean) }}" method="POST" class="mt-6">
                 @csrf
                 <button type="submit" class="rounded-2xl bg-error-container px-6 py-3 text-sm font-semibold text-on-error-container hover:brightness-95 transition">Batalkan Antrean</button>
             </form>

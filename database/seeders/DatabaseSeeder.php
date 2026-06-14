@@ -4,174 +4,236 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
-use App\Models\Polis;
-use App\Models\Doctor;
-use App\Models\JadwalDokter;
+use Illuminate\Support\Str;
+use App\Models\Pengguna;
+use App\Models\Pasien;
+use App\Models\Dokter;
+use App\Models\Petugas;
+use App\Models\KepalaPuskesmas;
+use App\Models\Poli;
+use App\Models\JadwalLayanan;
 use App\Models\Antrean;
+use App\Models\Notifikasi;
 use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Admin user
-        $admin = User::create([
-            'name' => 'Admin Utama',
-            'email' => 'admin@puskesmas.id',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-            'nik' => '3275000000000001',
+        // ─── Admin ───
+        Pengguna::create([
+            'idpengguna'   => 'USR000000001',
+            'email'        => 'admin@puskesmas.id',
+            'passwordhash' => Hash::make('password'),
+            'role'         => 'admin',
+            'statusakun'   => 'aktif',
         ]);
 
-        // Doctors (user accounts)
-        $drAndi = User::create([
-            'name' => 'dr. Andi Wijaya',
-            'email' => 'andi@puskesmas.id',
-            'password' => Hash::make('password'),
-            'role' => 'doctor',
+        // ─── Petugas ───
+        $ptgPengguna = Pengguna::create([
+            'idpengguna'   => 'USR000000007',
+            'email'        => 'petugas@puskesmas.id',
+            'passwordhash' => Hash::make('password'),
+            'role'         => 'petugas',
+            'statusakun'   => 'aktif',
         ]);
-        $drgSiti = User::create([
-            'name' => 'drg. Siti Sarah',
-            'email' => 'siti@puskesmas.id',
-            'password' => Hash::make('password'),
-            'role' => 'doctor',
-        ]);
-        $drAhmad = User::create([
-            'name' => 'dr. Ahmad Hidayat',
-            'email' => 'ahmad@puskesmas.id',
-            'password' => Hash::make('password'),
-            'role' => 'doctor',
+        $petugas = Petugas::create([
+            'idpetugas'   => 'PTG000000001',
+            'idpengguna'  => 'USR000000007',
+            'namapetugas' => 'Sari Mulyani',
+            'nomorinduk'  => '198501012010012001',
+            'statusaktif' => 'aktif',
+            'shift'       => 'pagi',
         ]);
 
-        // Sample patient
-        $patient1 = User::create([
-            'name' => 'Budi Santoso',
-            'email' => 'budi@gmail.com',
-            'nik' => '3275082109920001',
-            'no_hp' => '081234567890',
-            'password' => Hash::make('password'),
-            'role' => 'patient',
+        // ─── Kepala Puskesmas ───
+        $kplPengguna = Pengguna::create([
+            'idpengguna'   => 'USR000000008',
+            'email'        => 'kepala@puskesmas.id',
+            'passwordhash' => Hash::make('password'),
+            'role'         => 'kepala',
+            'statusakun'   => 'aktif',
+        ]);
+        KepalaPuskesmas::create([
+            'idkepala'        => 'KPL000000001',
+            'idpengguna'      => 'USR000000008',
+            'namakepala'      => 'dr. Hj. Ratna Dewi',
+            'nomorinduk'      => '197801012005012001',
+            'periodejabatan'  => '2024-2028',
         ]);
 
-        // More sample patients for dummy data
+        // ─── Dokter ───
+        $drAndiPengguna = Pengguna::create([
+            'idpengguna'   => 'USR000000002',
+            'email'        => 'andi@puskesmas.id',
+            'passwordhash' => Hash::make('password'),
+            'role'         => 'dokter',
+            'statusakun'   => 'aktif',
+        ]);
+        $drAndi = Dokter::create([
+            'iddokter'    => 'DOK000000001',
+            'idpengguna'  => 'USR000000002',
+            'namadokter'  => 'dr. Andi Wijaya',
+            'jenisdokter' => 'Dokter Umum',
+        ]);
+
+        $drgSitiPengguna = Pengguna::create([
+            'idpengguna'   => 'USR000000003',
+            'email'        => 'siti@puskesmas.id',
+            'passwordhash' => Hash::make('password'),
+            'role'         => 'dokter',
+            'statusakun'   => 'aktif',
+        ]);
+        $drgSiti = Dokter::create([
+            'iddokter'    => 'DOK000000002',
+            'idpengguna'  => 'USR000000003',
+            'namadokter'  => 'drg. Siti Sarah',
+            'jenisdokter' => 'Spesialis Gigi & Mulut',
+        ]);
+
+        $drAhmadPengguna = Pengguna::create([
+            'idpengguna'   => 'USR000000004',
+            'email'        => 'ahmad@puskesmas.id',
+            'passwordhash' => Hash::make('password'),
+            'role'         => 'dokter',
+            'statusakun'   => 'aktif',
+        ]);
+        $drAhmad = Dokter::create([
+            'iddokter'    => 'DOK000000003',
+            'idpengguna'  => 'USR000000004',
+            'namadokter'  => 'dr. Ahmad Hidayat',
+            'jenisdokter' => 'Spesialis Penyakit Dalam',
+        ]);
+
+        // ─── Pasien ───
+        $patient1Pengguna = Pengguna::create([
+            'idpengguna'   => 'USR000000005',
+            'email'        => 'budi@gmail.com',
+            'passwordhash' => Hash::make('password'),
+            'role'         => 'pasien',
+            'statusakun'   => 'aktif',
+        ]);
+        $patient1 = Pasien::create([
+            'idpasien'     => 'PSN000000001',
+            'idpengguna'   => 'USR000000005',
+            'nik'          => '3275082109920001',
+            'namapasien'   => 'Budi Santoso',
+            'nomorhp'      => '081234567890',
+        ]);
+
         $patients = [$patient1];
         $patientNames = [
             'Siti Nurhaliza', 'Ahmad Zaki', 'Rini Wijaya', 'Bambang Suryanto',
             'Dina Kusuma', 'Eka Putra', 'Fiona Cahya', 'Gilang Ramadhan',
             'Hana Wijaksono', 'Indra Kusuma', 'Jasmine Putri', 'Kiki Rahman',
-            'Lina Suyanto', 'Mira Kusuma'
+            'Lina Suyanto', 'Mira Kusuma',
         ];
 
         foreach ($patientNames as $idx => $name) {
-            $patients[] = User::create([
-                'name' => $name,
-                'email' => 'patient' . ($idx + 2) . '@gmail.com',
-                'nik' => '3275082109920' . str_pad($idx + 2, 3, '0', STR_PAD_LEFT),
-                'no_hp' => '0812345678' . str_pad($idx + 2, 2, '0', STR_PAD_LEFT),
-                'password' => Hash::make('password'),
-                'role' => 'patient',
+            $usrId = 'USR' . str_pad($idx + 10, 9, '0', STR_PAD_LEFT);
+            $psnId = 'PSN' . str_pad($idx + 2, 9, '0', STR_PAD_LEFT);
+
+            Pengguna::create([
+                'idpengguna'   => $usrId,
+                'email'        => 'patient' . ($idx + 2) . '@gmail.com',
+                'passwordhash' => Hash::make('password'),
+                'role'         => 'pasien',
+                'statusakun'   => 'aktif',
+            ]);
+            $patients[] = Pasien::create([
+                'idpasien'   => $psnId,
+                'idpengguna' => $usrId,
+                'nik'        => '3275082109920' . str_pad($idx + 2, 3, '0', STR_PAD_LEFT),
+                'namapasien' => $name,
+                'nomorhp'    => '0812345678' . str_pad($idx + 2, 2, '0', STR_PAD_LEFT),
             ]);
         }
 
-        // Poli
-        $poliUmum  = Polis::create(['nama' => 'Poli Umum',  'kode' => 'A', 'lokasi' => 'Lt. 1 Gedung A', 'icon' => 'stethoscope',   'kuota_harian' => 50]);
-        $poliGigi  = Polis::create(['nama' => 'Poli Gigi',  'kode' => 'G', 'lokasi' => 'Lt. 2 Gedung B', 'icon' => 'dentistry',     'kuota_harian' => 20]);
-        $poliKia   = Polis::create(['nama' => 'Poli KIA',   'kode' => 'K', 'lokasi' => 'Lt. 1 Gedung B', 'icon' => 'child_care',    'kuota_harian' => 30, 'is_active' => false]);
-        $poliLansia= Polis::create(['nama' => 'Poli Lansia','kode' => 'L', 'lokasi' => 'Lt. 1 Gedung C', 'icon' => 'elderly',       'kuota_harian' => 30]);
+        // ─── Poli ───
+        $poliUmum   = Poli::create(['idpoli' => 'POL0000001', 'namapoli' => 'Poli Umum',   'kuotaharian' => 50, 'statusbuka' => 'buka', 'jamoperasional' => '08:00-12:00']);
+        $poliGigi   = Poli::create(['idpoli' => 'POL0000002', 'namapoli' => 'Poli Gigi',   'kuotaharian' => 20, 'statusbuka' => 'buka', 'jamoperasional' => '08:00-14:00']);
+        $poliKia    = Poli::create(['idpoli' => 'POL0000003', 'namapoli' => 'Poli KIA',    'kuotaharian' => 30, 'statusbuka' => 'tutup', 'jamoperasional' => '08:00-12:00']);
+        $poliLansia = Poli::create(['idpoli' => 'POL0000004', 'namapoli' => 'Poli Lansia', 'kuotaharian' => 30, 'statusbuka' => 'buka', 'jamoperasional' => '08:00-12:00']);
 
-        // Doctors linked to poli
-        $doc1 = Doctor::create(['user_id' => $drAndi->id,  'poli_id' => $poliUmum->id, 'spesialisasi' => 'Dokter Umum',          'rating' => 4.9, 'total_pasien' => 120]);
-        $doc2 = Doctor::create(['user_id' => $drgSiti->id, 'poli_id' => $poliGigi->id, 'spesialisasi' => 'Spesialis Gigi & Mulut','rating' => 4.8, 'total_pasien' => 85]);
-        $doc3 = Doctor::create(['user_id' => $drAhmad->id, 'poli_id' => $poliUmum->id, 'spesialisasi' => 'Spesialis Penyakit Dalam','rating' => 4.9,'total_pasien' => 120]);
-
-        // Jadwal for next 7 days
+        // ─── Jadwal Layanan ───
         $jadwals = [];
+        $jadwalIdx = 1;
         for ($i = 0; $i < 7; $i++) {
             $date = now()->addDays($i)->format('Y-m-d');
-            // Skip Sunday (0)
             if (now()->addDays($i)->dayOfWeek === 0) continue;
 
-            $jadwals[] = JadwalDokter::create(['doctor_id' => $doc1->id, 'poli_id' => $poliUmum->id, 'tanggal' => $date, 'jam_mulai' => '08:00', 'jam_selesai' => '12:00', 'kuota' => 20]);
-            $jadwals[] = JadwalDokter::create(['doctor_id' => $doc2->id, 'poli_id' => $poliGigi->id, 'tanggal' => $date, 'jam_mulai' => '08:00', 'jam_selesai' => '14:00', 'kuota' => 10]);
-            $jadwals[] = JadwalDokter::create(['doctor_id' => $doc3->id, 'poli_id' => $poliUmum->id, 'tanggal' => $date, 'jam_mulai' => '13:00', 'jam_selesai' => '17:00', 'kuota' => 15]);
+            $jadwals[] = JadwalLayanan::create(['idjadwal' => 'JDW' . str_pad($jadwalIdx++, 7, '0', STR_PAD_LEFT), 'iddokter' => $drAndi->iddokter,  'idpoli' => $poliUmum->idpoli, 'tanggal' => $date, 'kuotamaksimal' => 20]);
+            $jadwals[] = JadwalLayanan::create(['idjadwal' => 'JDW' . str_pad($jadwalIdx++, 7, '0', STR_PAD_LEFT), 'iddokter' => $drgSiti->iddokter, 'idpoli' => $poliGigi->idpoli, 'tanggal' => $date, 'kuotamaksimal' => 10]);
+            $jadwals[] = JadwalLayanan::create(['idjadwal' => 'JDW' . str_pad($jadwalIdx++, 7, '0', STR_PAD_LEFT), 'iddokter' => $drAhmad->iddokter, 'idpoli' => $poliUmum->idpoli, 'tanggal' => $date, 'kuotamaksimal' => 15]);
         }
 
-        // Create dummy antrean data for past days (selesai/batal)
+        // ─── Antrean Kemarin ───
         $statusesYesterday = ['selesai', 'selesai', 'selesai', 'selesai', 'batal'];
+        $antreanIdx = 1;
         for ($i = 0; $i < 8; $i++) {
             $yesterday = now()->subDays(1)->format('Y-m-d');
             $patient = $patients[$i % count($patients)];
-            $doctor = $i % 2 === 0 ? $doc1 : $doc2;
-            $poli = $doctor->poli;
+            $jadwal = $jadwals[$i % count($jadwals)];
+            $status = $statusesYesterday[$i % count($statusesYesterday)];
 
             Antrean::create([
-                'user_id' => $patient->id,
-                'poli_id' => $poli->id,
-                'doctor_id' => $doctor->id,
-                'jadwal_id' => $jadwals[0]->id,
-                'nomor_antrean' => $poli->kode . '-' . str_pad($i + 1, 3, '0', STR_PAD_LEFT),
-                'tanggal' => $yesterday,
-                'jam_kedatangan' => '08:' . str_pad($i * 5, 2, '0', STR_PAD_LEFT),
-                'estimasi_layanan' => '00:15:00',
-                'status' => $statusesYesterday[$i % count($statusesYesterday)],
-                'keluhan' => ['Demam & batuk', 'Sakit kepala', 'Nyeri gigi', 'Pemeriksaan rutin', 'Sakit perut'][rand(0, 4)],
-                'dipanggil_at' => now()->subDays(1)->setHour(rand(8, 14)),
-                'selesai_at' => $statusesYesterday[$i % count($statusesYesterday)] === 'selesai' ? now()->subDays(1)->setHour(rand(8, 15)) : null,
+                'idantrean'      => 'ANT' . str_pad($antreanIdx++, 7, '0', STR_PAD_LEFT),
+                'idpasien'       => $patient->idpasien,
+                'idjadwal'       => $jadwal->idjadwal,
+                'idpetugas'      => $petugas->idpetugas,
+                'nomorantrean'   => 'A-' . str_pad($i + 1, 3, '0', STR_PAD_LEFT),
+                'status'         => $status,
+                'waktudaftar'    => now()->subDays(1)->setHour(8)->setMinute($i * 5),
+                'waktupanggil'   => now()->subDays(1)->setHour(rand(8, 14)),
+                'waktuselesai'   => $status === 'selesai' ? now()->subDays(1)->setHour(rand(8, 15)) : null,
+                'estimasitunggu' => 15,
+                'jenispasien'    => $i % 2 === 0 ? 'UMUM' : 'BPJS',
             ]);
         }
 
-        // Create dummy antrean data for today with mixed statuses
+        // ─── Antrean Hari Ini ───
         $today = now()->format('Y-m-d');
         $statuses = ['menunggu', 'menunggu', 'menunggu', 'dipanggil', 'selesai'];
-
         for ($i = 0; $i < 10; $i++) {
             $patient = $patients[$i % count($patients)];
-            $doctor = $i % 3 === 0 ? $doc1 : ($i % 3 === 1 ? $doc2 : $doc3);
-            $poli = $doctor->poli;
+            $jadwal = $jadwals[$i % count($jadwals)];
             $status = $statuses[$i % count($statuses)];
 
-            $antrean = Antrean::create([
-                'user_id' => $patient->id,
-                'poli_id' => $poli->id,
-                'doctor_id' => $doctor->id,
-                'jadwal_id' => $jadwals[$i % count($jadwals)]->id,
-                'nomor_antrean' => $poli->kode . '-' . str_pad($i + 1, 3, '0', STR_PAD_LEFT),
-                'tanggal' => $today,
-                'jam_kedatangan' => '08:' . str_pad($i * 5, 2, '0', STR_PAD_LEFT),
-                'estimasi_layanan' => '00:' . str_pad(15 + rand(0, 30), 2, '0', STR_PAD_LEFT) . ':00',
-                'status' => $status,
-                'keluhan' => ['Demam & batuk', 'Sakit kepala', 'Nyeri gigi', 'Pemeriksaan rutin', 'Sakit perut'][rand(0, 4)],
-                'dipanggil_at' => $status !== 'menunggu' ? now()->setHour(rand(8, 14)) : null,
-                'selesai_at' => $status === 'selesai' ? now()->setHour(rand(8, 15)) : null,
+            Antrean::create([
+                'idantrean'      => 'ANT' . str_pad($antreanIdx++, 7, '0', STR_PAD_LEFT),
+                'idpasien'       => $patient->idpasien,
+                'idjadwal'       => $jadwal->idjadwal,
+                'idpetugas'      => $petugas->idpetugas,
+                'nomorantrean'   => 'A-' . str_pad($i + 1, 3, '0', STR_PAD_LEFT),
+                'status'         => $status,
+                'waktudaftar'    => now()->setHour(8)->setMinute($i * 5),
+                'waktupanggil'   => $status !== 'menunggu' ? now()->setHour(rand(8, 14)) : null,
+                'waktuselesai'   => $status === 'selesai' ? now()->setHour(rand(8, 15)) : null,
+                'estimasitunggu' => 15 + rand(0, 30),
+                'jenispasien'    => $i % 2 === 0 ? 'UMUM' : 'BPJS',
             ]);
 
-            // Increment jadwal terisi count
-            $jadwals[$i % count($jadwals)]->increment('terisi');
+            $jadwal->increment('kuotaterisi');
         }
 
-        // Create dummy antrean data for tomorrow
+        // ─── Antrean Besok ───
         $tomorrow = now()->addDays(1)->format('Y-m-d');
         for ($i = 0; $i < 6; $i++) {
             $patient = $patients[$i % count($patients)];
-            $doctor = $i % 2 === 0 ? $doc1 : $doc3;
-            $poli = $doctor->poli;
+            $jadwal = $jadwals[$i % count($jadwals)];
 
             Antrean::create([
-                'user_id' => $patient->id,
-                'poli_id' => $poli->id,
-                'doctor_id' => $doctor->id,
-                'jadwal_id' => $jadwals[$i % count($jadwals)]->id,
-                'nomor_antrean' => $poli->kode . '-' . str_pad($i + 1, 3, '0', STR_PAD_LEFT),
-                'tanggal' => $tomorrow,
-                'jam_kedatangan' => '08:' . str_pad($i * 5, 2, '0', STR_PAD_LEFT),
-                'estimasi_layanan' => '00:20:00',
-                'status' => 'menunggu',
-                'keluhan' => ['Demam & batuk', 'Sakit kepala', 'Nyeri gigi'][rand(0, 2)],
+                'idantrean'      => 'ANT' . str_pad($antreanIdx++, 7, '0', STR_PAD_LEFT),
+                'idpasien'       => $patient->idpasien,
+                'idjadwal'       => $jadwal->idjadwal,
+                'nomorantrean'   => 'A-' . str_pad($i + 1, 3, '0', STR_PAD_LEFT),
+                'status'         => 'menunggu',
+                'waktudaftar'    => now()->addDays(1)->setHour(8)->setMinute($i * 5),
+                'estimasitunggu' => 20,
+                'jenispasien'    => 'UMUM',
             ]);
 
-            // Increment jadwal terisi count
-            $jadwals[$i % count($jadwals)]->increment('terisi');
+            $jadwal->increment('kuotaterisi');
         }
     }
 }

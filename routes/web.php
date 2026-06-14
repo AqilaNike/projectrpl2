@@ -6,7 +6,6 @@ use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Auth ───────────────────────────────────────────────────────────────────
-// Redirect root to the named login route to avoid duplicate route names
 Route::get('/', function () {
     return redirect()->route('login');
 });
@@ -17,7 +16,7 @@ Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // ─── Patient Routes ──────────────────────────────────────────────────────────
-Route::prefix('pasien')->name('patient.')->middleware(['auth', 'role:patient'])->group(function () {
+Route::prefix('pasien')->name('patient.')->middleware(['auth', 'role:pasien'])->group(function () {
     Route::get('/home',            [PatientController::class, 'home'])->name('home');
     Route::get('/ambil-antrean',   [PatientController::class, 'ambilAntrean'])->name('ambil-antrean');
     Route::get('/api/dokter',      [PatientController::class, 'getDokterByPoli'])->name('api.dokter');
@@ -29,7 +28,7 @@ Route::prefix('pasien')->name('patient.')->middleware(['auth', 'role:patient'])-
 });
 
 // ─── Admin Routes ────────────────────────────────────────────────────────────
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,doctor'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,dokter,petugas,kepala'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/monitor',   [AdminController::class, 'monitor'])->name('monitor');
 
@@ -42,8 +41,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,doctor']
     // Schedule Management
     Route::get('/jadwal',                             [AdminController::class, 'jadwal'])->name('jadwal');
     Route::post('/jadwal',                            [AdminController::class, 'storeJadwal'])->name('jadwal.store');
-    Route::post('/poli/{poli}/kuota',                 [AdminController::class, 'updateKuotaPoli'])->name('poli.kuota');
-    Route::post('/poli/{poli}/toggle',                [AdminController::class, 'togglePoli'])->name('poli.toggle');
+    Route::post('/poli/{idpoli}/kuota',               [AdminController::class, 'updateKuotaPoli'])->name('poli.kuota');
+    Route::post('/poli/{idpoli}/toggle',              [AdminController::class, 'togglePoli'])->name('poli.toggle');
+
+    // Registrasi Offline
+    Route::get('/registrasi',                         [AdminController::class, 'registrasi'])->name('registrasi');
+    Route::post('/registrasi',                        [AdminController::class, 'storeRegistrasi'])->name('registrasi.store');
+    
+    // Cetak Nomor
+    Route::get('/cetak',                              [AdminController::class, 'cetak'])->name('cetak');
+    Route::get('/cetak/{antrean}/print',              [AdminController::class, 'printTiket'])->name('cetak.print');
+
+    // Laporan
+    Route::get('/laporan',                            [AdminController::class, 'laporan'])->name('laporan');
 });
-
-
