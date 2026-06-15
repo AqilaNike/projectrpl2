@@ -4,11 +4,7 @@
 
 @section('content')
 @include('layouts.admin-sidebar')
-<<<<<<< HEAD
 <main class="flex-1 md:ml-64 pt-8 pb-20 px-4 md:px-8 min-h-screen">
-=======
-<main class="pt-24 pb-20 px-4 md:px-16 max-w-7xl mx-auto md:ml-64">
->>>>>>> 1898eeecec7caa27b4a2bf4b955cdb0bb07b3db6
     <div class="rounded-3xl bg-surface-container p-6 shadow-sm border border-outline-variant">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
